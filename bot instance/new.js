@@ -149,3 +149,5 @@ constructor(ip,port,username,password=null,owner){
     this.#intialize();
 }
 }
+
+module.exports.Client = client;
