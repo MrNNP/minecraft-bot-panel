@@ -1,5 +1,3 @@
-
-
 var mineflayer = require("mineflayer");
 
 var bloodhoundPlugin = require("mineflayer-bloodhound");
@@ -49,11 +47,9 @@ bot.once('spawn', function () {
         if (bot.food === 20) {
 
             bot.autoEat.disable();
-        }
-        else {
+        } else {
             bot.autoEat.enable();
-        }
-        ;
+        };
     });
     bot.on('whisper', function (username, message) {
         if (username === bot.username)
@@ -68,18 +64,13 @@ bot.once('spawn', function () {
                     case "stop":
                         bot.pathfinder.setGoal(null);
                         break;
-                }
-                ;
-            }
-            else if (username !== args[2]) {
+                };
+            } else if (username !== args[2]) {
                 bot.whisper(username, 'Sorry, I am an AFK Bot');
-            }
-            ;
-        }
-        catch (err) {
+            };
+        } catch (err) {
             console.log("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n            Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
-        }
-        ;
+        };
         //Error handling
     });
     //Runs when bot is kicked
@@ -96,15 +87,12 @@ bot.once('spawn', function () {
             setTimeout(function () {
                 process.exit(1);
             }, 5000);
-        }
-        else {
+        } else {
             //If message does not include banned, then tell user and attempt to connect again set timeout
             console.log(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
             //Reset bot and retry joining
-            setTimeout(function () {
-            }, 5000);
-        }
-        ;
+            setTimeout(function () {}, 5000);
+        };
     });
     bot.on('death', function () {
         console.log(" <STATUS> I died!");
@@ -117,13 +105,10 @@ bot.once('spawn', function () {
         if (bot.username === victim.username) {
             if (weapon) {
                 console.log(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
-            }
-            else {
+            } else {
                 console.log(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username));
-            }
-            ;
-        }
-        ;
+            };
+        };
     });
     setInterval(function () {
         setTimeout(function () {
@@ -132,25 +117,22 @@ bot.once('spawn', function () {
         bot.setControlState('jump', true);
     }, 100000);
 });
+
 function lookNearEntity() {
     setInterval(function () {
         var entity = bot.nearestEntity();
         if (entity !== null) {
             if (entity.type === 'player') {
                 bot.lookAt(entity.position.offset(0, 1.6, 0));
-            }
-            else if (entity.type === 'mob') {
+            } else if (entity.type === 'mob') {
                 bot.lookAt(entity.position);
-            }
-            ;
-        }
-        ;
+            };
+        };
     }, 50);
-}
-;
+};
+
 function followOwner(playerToFollow, username) {
     bot.whisper(username, 'On my way');
     bot.pathfinder.setGoal(new GoalFollow(playerToFollow, 2), true);
-}
-;
+};
 //# sourceMappingURL=index.js.map
