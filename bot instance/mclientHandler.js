@@ -17,8 +17,10 @@ parentPort.on('message', (input)=>{
         case 'start':
             mclient.push({
                 id:input.data.id, 
+                channel:input.data.channel,
                 client:new Client(
                 sendOut,
+                input.data.id,
                 input.data.options.bot.ip,
                 null,
                 input.data.options.bot.username,
@@ -48,5 +50,6 @@ parentPort.on('message', (input)=>{
 
 function sendOut(data){
     parentPort.postMessage(data);
+    
 }
 

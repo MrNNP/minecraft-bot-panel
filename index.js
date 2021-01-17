@@ -11,7 +11,7 @@ DiscBot.onMessage(async (msg)=>{
         try {
             switch (args[0]){
                 case 'join':
-                    if(dbgetObj({id:msg.author.id})==-1){
+                    if(dbgetObjIndex({id:msg.author.id})==-1){
                     msg.channel.send('Welcome to MinecraftAFKBot '+msg.author.tag+'! \n Please run _setup [server ip] [Your minecraft username] [username] [password(optional)] to set up your bot.');
                     new User({id:msg.author.id});
                     } else {
@@ -20,7 +20,7 @@ DiscBot.onMessage(async (msg)=>{
                     }
                 break;
                 case 'setup':
-                    if(dbgetObj({id:msg.author.id})==-1){
+                    if(dbgetObjIndex({id:msg.author.id})==-1){
                         msg.channel.send('You need to run _join to use this bot.');
                     }else{
                     try{
@@ -36,7 +36,7 @@ DiscBot.onMessage(async (msg)=>{
                     }
                 }
                 
-                database.users[dbgetObj({id:msg.author.id})] = {
+                database.users[dbgetObjIndex({id:msg.author.id})] = {
                     id:msg.author.id,
                     channel:msg.channel.id,
                     options:optionObj
@@ -54,7 +54,7 @@ DiscBot.onMessage(async (msg)=>{
     }
 });
 
-
+global.toDiscord = Discbot.sendMessageTo;
 
 
 

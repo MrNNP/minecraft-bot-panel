@@ -116,11 +116,20 @@ lookNearEntity = ()=>{
 }
 
 logger = (data)=>{
-    this.output(data);
+    let discordOutput = {
+        id:this.id,
+        intent:'discord',
+        data:{
+            response:data
+        }
+    }
+    
+    this.output(discordOutput);
 
 }
 
-constructor(outputfunct,ip,port,username,password=null,owner){
+constructor(outputfunct,id,ip,port,username,password=null,owner){
+    this.id = id;
     this.output = outputfunct;
     this.owner = owner;
     this.ip = ip;

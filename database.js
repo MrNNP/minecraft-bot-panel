@@ -25,7 +25,7 @@ global.dbdeleteObj = function (userObject) {
     database.users.splice(indexOfObj,1);
     return;
 }
-global.dbgetObj = (userObject)=>{
+global.dbgetObjIndex = (userObject)=>{
     return database.users.findIndex((element)=>{
         return element.id == userObject.id
         });

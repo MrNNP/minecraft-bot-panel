@@ -2,10 +2,11 @@
 const Discord = require('discord.js');
 const database = require('./database');
 const token = 'Nzk5ODQxMDU3NTQxODQ5MTcw.YAJcCA.p5IrMf3aOc8hjHFIx8b-jOx97fc';
-const { fork } = require('child_process');
+//const { fork } = require('child_process');
 const { Worker } = require('worker_threads');
+var threadHandler = new require('./threadHandler.js').threadHandler;
 const rl = require('readline');
-
+const maxPerThread = 16;
 
 
 
@@ -49,7 +50,8 @@ class User{
 }
 class mclient{
 constructor(userObj,channel){
-    
+    threadHandler.newMclient(userObj);
+
 }
 
 kill = () =>{
@@ -62,44 +64,7 @@ module.exports.User = User;
 module.exports.mclient = mclient;
 
 
-class threadHandler{
-    
-    constructor(){
-    this.workerList = [];
 
-    this.newThread();
-    }
-    newThread = () => {
-        this.workerList.push(new Worker('bot instance/mclientHandler.js'));
-    }
-
-    newMClient = (userObj) => {
-        let responses = [];
-
-        this.workerList.forEach( async (child,index) => {
-            child.postMessage({
-                intent:'check'
-            });
-            await child.once('message',(msg) =>{
-                responses[index] = msg.data.response;
-            });
-
-        });
-        responses.forEach((response,index)=>{
-            if(response < 16){
-                this.workerList[index].postMessage({
-                    intent:'start',
-                    data:userObj
-                });
-                break;
-                return;
-            }
-        });
-        this.newThread();
-        this.newMClient(userObj);
-    }
-
-    }
 
 
 
