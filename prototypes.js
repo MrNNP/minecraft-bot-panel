@@ -52,50 +52,14 @@ class mclient{
 constructor(userObj){
     threadHandler.newMclient(userObj);
 }
-stop = (userObj) => {
+static stop = (userObj) => {
     threadHandler.stop(userObj);
+    
 }
 
-kill = () =>{
-    this.child.send({intent:'stop'});
-}
+
 }
 module.exports.Discord = Discord;
 module.exports.bot = bot;
 module.exports.User = User;
 module.exports.mclient = mclient;
-
-
-
-
-
-
-
-
-
-
-/*
-this.child = new Worker('./mclientHandler.js');
-    
-    
-    
-    this.child.postMessage({
-        intent:'start',
-        data:userObj
-    });
-    this.child.on('message',(msg)=>{
-        if(msg.intent == 'data'){
-            switch (msg.content){
-                case 'death':
-                    channel.send( new Discord.MessageEmbed().setColor('#0522e3')).setTitle('I died');
-                //TODO: add the rest of the events in
-
-            }
-        }else if(msg.intent == 'discord'){
-            channel.send(msg.content);
-        }
-
-
-    });
-
-    */

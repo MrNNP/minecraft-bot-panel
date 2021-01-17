@@ -1,11 +1,13 @@
 const db = require('./database.js');
 
 global.database = db.parsed;
-const { Discord, User, bot } = require('./prototypes.js');
-var DiscBot = new bot();
-const prefix = '_'
+const { Discord, User, bot, mclient } = require('./prototypes.js');
+var DiscordBot = new bot();
+const prefix = '_';
 
-DiscBot.onMessage(async (msg)=>{
+global.toDiscord = DiscordBot.sendMessageTo;
+
+DiscordBot.onMessage(async (msg)=>{
     if(!msg.author.bot&&msg.content.startsWith(prefix)){
         let args = msg.content.substring(1).split(" "); 
         try {
@@ -41,20 +43,28 @@ DiscBot.onMessage(async (msg)=>{
                     channel:msg.channel.id,
                     options:optionObj
                 };
-                msg.channel.send(`Success, now use _start to start your bot! \n Bot was bound to |${msg.channel.name}|`);
+                msg.channel.send(`Success, now use _start to start your bot! \n Bot was bound to channel ${msg.channel.name}`);
                 }catch(e){
                     msg.channel.send('Make sure to include all the parameters. Format is _setup [server ip] [Your minecraft username] [username] [password(optional)]');
                 }
             }
             break;
-        }
+                case 'start':
+                    if(dbgetObjIndex({id:msg.author.id})==-1||!database.users[dbgetObjIndex({id:msg.author.id})].channel){
+                        msg.channel.send('You need to run _join and _setup to use this command.');
+                    } else{
+                        new mclient(database.users[dbgetObjIndex({id:msg.author.id})]);
+                    }
+                    break;
+                case 'stop':
+                    mclient.stop(database.users[dbgetObjIndex({id:msg.author.id})]);
+            }
         } catch (error) {
             console.error(error);
         }
     }
 });
 
-global.toDiscord = Discbot.sendMessageTo;
 
 
 

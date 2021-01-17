@@ -33,7 +33,7 @@ class threadHandler{
                 });
                 this.workerList[index].users.push(userObj);
 
-                break;
+                
                 return;
             }
         });
@@ -52,7 +52,13 @@ class threadHandler{
     }
     stop = (userObj) =>{
         this.workerList.users.splice(this.workerList.users.indexOf(userObj.id),1);
-        this.workerList
+        
+        this.workerList.forEach((child,index) =>{
+            child.postMessage({
+                intent:'stop',
+                data:userObj
+            });
+        });
     }
 
     }
