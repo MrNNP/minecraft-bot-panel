@@ -20,7 +20,7 @@ var bot = mineflayer.createBot({
     //password: args[3]? args[3]:null,
     hideErrors: true
 });
-//TODO: add bot var to db?
+//done: add bot var to db?
 //Initiallize Plugins
 bloodhoundPlugin(bot);
 

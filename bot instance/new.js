@@ -46,7 +46,7 @@ onWhisper = ()=>{
                             bot.whisper(username, 'Sorry, I am an AFK Bot');
                         };
                     } catch (err) {
-                        console.log("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n            Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
+                        this.logger("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n            Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
                     };
                     //Error handling
                 });
@@ -60,12 +60,12 @@ onDisconnect = ()=>{
                     return;
                     if (reasonKicked.extra[0].text.includes('banned')) {
                         //Check if bot was banned
-                        console.log(' <STATUS> I got banned. Exiting in 5 seconds...');
+                        this.logger(' <STATUS> I got banned. Exiting in 5 seconds...');
                         //Exit process if banned 
                         
                     } else {
                         //If message does not include banned, then tell user and attempt to connect again set timeout
-                        console.log(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
+                        this.logger(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
                         //Reset bot and retry joining
                         
                     };
@@ -73,21 +73,21 @@ onDisconnect = ()=>{
 }
 onDeath = ()=>{
                 this.bot.on('death', function () {
-                    console.log(" <STATUS> I died!");
+                    this.logger(" <STATUS> I died!");
                 });
 }
 onRespawn = ()=>{
                 this.bot.on('respawn', function () {
-                    console.log(" <STATUS> Respawned at x: " + Math.round(bot.entity.position.x) + " y: " + Math.round(bot.entity.position.y) + " z: " + Math.round(bot.entity.position.z));
+                    this.logger(" <STATUS> Respawned at x: " + Math.round(bot.entity.position.x) + " y: " + Math.round(bot.entity.position.y) + " z: " + Math.round(bot.entity.position.z));
                 });
 }
 onAttacked = ()=>{
                 this.bot.on('onCorrelateAttack', function (attacker, victim, weapon) {
                     if (this.bot.username === victim.username) {
                         if (weapon) {
-                            console.log(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
+                            this.logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
                         } else {
-                            console.log(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username));
+                            this.logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username));
                         };
                     };
                 });
@@ -115,7 +115,13 @@ lookNearEntity = ()=>{
     this.lookNearEntity();
 }
 
-constructor(ip,port,username,password=null,owner){
+logger = (data)=>{
+    this.output(data);
+
+}
+
+constructor(outputfunct,ip,port,username,password=null,owner){
+    this.output = outputfunct;
     this.owner = owner;
     this.ip = ip;
     this.port = port;
@@ -147,6 +153,7 @@ constructor(ip,port,username,password=null,owner){
         bannedFood: [],
     };
     this.#intialize();
+
 }
 }
 

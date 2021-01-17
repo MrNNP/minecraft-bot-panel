@@ -1,30 +1,52 @@
-const readline = require('readline');
+//const readline = require('readline');
 const { Client } = require('./new.js');
+const { parentPort, workerData } = require('worker_threads');
 
+/*
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
+*/
+var mclientList = [];
 
-var mclient;
-rl.on('line', (input)=>{
 
-    let input = JSON.parse(input);
+parentPort.on('message', (input)=>{
+    
     switch (input.intent){
         case 'start':
-            mclient = new Client(input.data.ip,null,input.data.username,input.data.password,input.data.owner);
+            mclient.push({
+                id:input.data.id, 
+                client:new Client(
+                sendOut,
+                input.data.options.bot.ip,
+                null,
+                input.data.options.bot.username,
+                input.data.options.bot.password,
+                input.data.options.bot.owner)});
+        break;
+        case 'check':
+            
+            sendOut({
+                intent:'response',  
+                data:{
+                    purpose:'check',
+                    response:mclientList.length
+                }
+            });
+            
         break;
         case 'stop':
-            mclient.bot.end();
-            process.exit(0);
+            mclientList.forEach((client)=>{
+            client.client.bot.end();
+        });
+        process.exit(0);
         break;
     }
 
 });
 
-rl.on('close', ()=>{
+function sendOut(data){
+    parentPort.postMessage(data);
+}
 
-    mclient.bot.end();
-    process.exit(0);
-
-});
