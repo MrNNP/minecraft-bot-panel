@@ -49,9 +49,11 @@ class User{
     }
 }
 class mclient{
-constructor(userObj,channel){
+constructor(userObj){
     threadHandler.newMclient(userObj);
-
+}
+stop = (userObj) => {
+    threadHandler.stop(userObj);
 }
 
 kill = () =>{

@@ -38,13 +38,17 @@ parentPort.on('message', (input)=>{
             });
             
         break;
-        case 'stop':
+        case 'kill':
             mclientList.forEach((client)=>{
             client.client.bot.end();
         });
         process.exit(0);
         break;
-    }
+        case 'stop':
+            try{
+            checkID(input.data.id).quit();
+            }catch(e){};
+        }
 
 });
 
@@ -53,3 +57,10 @@ function sendOut(data){
     
 }
 
+function checkID(id){
+    mclientList.forEach(client,()=>{
+        if(id==client.id){
+            return client;
+        }
+    });
+}

@@ -10,6 +10,7 @@ class threadHandler{
     newThread = () => {
         this.workerList.push({ users:[], child:new Worker('bot instance/mclientHandler.js')});
         this.workerList[this.workerList.length+1].on('message',onMessage(msg));
+        this.workerList[this.workerList.length+1].on('error',onError(msg)); 
     }
 
     newMClient = (userObj) => {
@@ -44,10 +45,15 @@ class threadHandler{
         toDiscord(msg.channel,msg.data.response);
     }
     onError = (msg) =>{
-        toDiscord()
-
+        this.workerList.users.forEach(user => {
+            toDiscord(user.channel, 'Your bot crashed. Try running _start again.');
+        });
+        console.log(msg);
     }
-
+    stop = (userObj) =>{
+        this.workerList.users.splice(this.workerList.users.indexOf(userObj.id),1);
+        this.workerList
+    }
 
     }
 
