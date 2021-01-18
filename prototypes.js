@@ -3,10 +3,9 @@ const Discord = require('discord.js');
 const database = require('./database');
 const token = 'Nzk5ODQxMDU3NTQxODQ5MTcw.YAJcCA.p5IrMf3aOc8hjHFIx8b-jOx97fc';
 //const { fork } = require('child_process');
-const { Worker } = require('worker_threads');
-var threadHandler = new require('./threadHandler.js').threadHandler;
-const rl = require('readline');
-const maxPerThread = 16;
+
+const threadHandlerclass = require('./threadHandler.js');
+var threadHandler = new threadHandlerclass;
 
 
 
@@ -50,7 +49,7 @@ class User{
 }
 class mclient{
 constructor(userObj){
-    threadHandler.newMclient(userObj);
+    threadHandler.newMClient(userObj);
 }
 static stop = (userObj) => {
     threadHandler.stop(userObj);

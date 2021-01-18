@@ -1,3 +1,8 @@
+const { Worker } = require('worker_threads');
+
+const maxPerThread = 16;
+var startSuccess = false;
+
 class threadHandler{
     
     constructor(){
@@ -8,23 +13,25 @@ class threadHandler{
     
     }
     newThread = () => {
-        this.workerList.push({ users:[], child:new Worker('bot instance/mclientHandler.js')});
-        this.workerList[this.workerList.length+1].on('message',onMessage(msg));
-        this.workerList[this.workerList.length+1].on('error',onError(msg)); 
+        this.workerList.push({ users:[], child:new Worker('./bot instance/mclientHandler.js')});
+        this.workerList[this.workerList.length-1].child.on('message',this.onMessage);
+        this.workerList[this.workerList.length-1].child.on('error',this.onError); 
     }
 
-    newMClient = (userObj) => {
+    newMClient = async (userObj) => {
         let responses = [];
 
-        this.workerList.forEach( async (child,index) => {
-            child.child.postMessage({
+        await this.workerList.forEach((child,index) => {
+             child.child.postMessage({
                 intent:'check'
             });
-            await child.child.once('message',(msg) =>{
+            child.child.once('message',(msg) =>{
                 responses[index] = msg.data.response;
             });
 
         });
+        setTimeout(() => {
+            startSuccess = false;
         responses.forEach((response,index)=>{
             if(response < maxPerThread){
                 this.workerList[index].child.postMessage({
@@ -33,21 +40,25 @@ class threadHandler{
                 });
                 this.workerList[index].users.push(userObj);
 
-                
+                startSuccess=true;
                 return;
             }
         });
+        if(startSuccess) return;
         this.newThread();
         this.newMClient(userObj);
+    },1000);
     }
     onMessage = (msg) =>{
+        try{
        msg.channel = database.users[dbgetObjIndex({id:msg.id})].channel;
         toDiscord(msg.channel,msg.data.response);
+        }catch(e){}
     }
     onError = (msg) =>{
-        this.workerList.users.forEach(user => {
-            toDiscord(user.channel, 'Your bot crashed. Try running _start again.');
-        });
+     //   this.workerList.users.forEach(user => {
+    //        toDiscord(user.channel, 'Your bot crashed. Try running _start again.');
+      //  });
         console.log(msg);
     }
     stop = (userObj) =>{
@@ -63,4 +74,4 @@ class threadHandler{
 
     }
 
-    module.exports.threadHandler = threadHandler;
+    module.exports = threadHandler;

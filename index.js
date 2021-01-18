@@ -17,7 +17,7 @@ DiscordBot.onMessage(async (msg)=>{
                     msg.channel.send('Welcome to MinecraftAFKBot '+msg.author.tag+'! \n Please run _setup [server ip] [Your minecraft username] [username] [password(optional)] to set up your bot.');
                     new User({id:msg.author.id});
                     } else {
-                        msg.channel.send('You only need to run _start once. You might be looking to run _setup [server ip] [Your minecraft username] [username] [password(optional)] to set up your bot.');
+                        msg.channel.send('You only need to run _join once. You might be looking to run _setup [server ip] [Your minecraft username] [username] [password(optional)] to set up your bot.');
                         msg.channel.send('You can run _setup multiple times to change your bot config.');
                     }
                 break;

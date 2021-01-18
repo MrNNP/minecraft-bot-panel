@@ -143,7 +143,7 @@ constructor(outputfunct,id,ip,port,username,password=null,owner){
         password: this.password,
         hideErrors: true
     });
-    
+    this.bot.connect();
     bloodhoundPlugin(this.bot);
     this.bot.bloodhound.yaw_correlation_enabled = true
     

@@ -15,7 +15,7 @@ parentPort.on('message', (input)=>{
     
     switch (input.intent){
         case 'start':
-            mclient.push({
+            mclientList.push({
                 id:input.data.id, 
                 channel:input.data.channel,
                 client:new Client(
