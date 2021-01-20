@@ -21,7 +21,7 @@ parentPort.on('message', (input)=>{
                 client:new Client(
                 sendOut,
                 input.data.id,
-                input.data.options.bot.ip,
+                input.data.options.bot.server.ip,
                 null,
                 input.data.options.bot.username,
                 input.data.options.bot.password,
@@ -45,9 +45,11 @@ parentPort.on('message', (input)=>{
         process.exit(0);
         break;
         case 'stop':
-            try{
-            checkID(input.data.id).quit();
-            }catch(e){};
+            
+                let child = checkID(input.data.id);
+                child.client.bot.quit();
+                chlid = undefined;
+            
         }
 
 });
@@ -58,9 +60,12 @@ function sendOut(data){
 }
 
 function checkID(id){
-    mclientList.forEach(client,()=>{
+    let child;
+    mclientList.forEach((client)=>{
         if(id==client.id){
-            return client;
+            child = client;
+            return;
         }
     });
+    return child;
 }

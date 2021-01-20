@@ -19,20 +19,25 @@ class bot {
             console.log('ready');
         });
     }
-    onMessage(funct){
+    onMessage = (funct)=>{
         this.client.on('message',msg=>{
             funct(msg);
         });
     }
-    sendMessageTo(id,content){
+    sendMessageTo = (id,content) =>{
+        let client = this.client;
        try{
-            this.client.users.cache.get(id).send(content);
-       }catch(e){} 
+           let channel =
+            client.users.cache.get(id);
+            channel.send(content);
+       }catch(e){console.log(e);} 
         try{
-            this.client.channels.cache.get(id).send(content);
+            let channel = 
+            client.channels.cache.get(id);
+            channel.send(content);
 
         
-        }catch(e){}
+        }catch(e){console.log(e);}
     }
     
 }

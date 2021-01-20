@@ -2,11 +2,11 @@ var mineflayer = require("mineflayer");
 
 var bloodhoundPlugin = require("mineflayer-bloodhound");
 
-var mineflayer_pathfinder_1 = require("mineflayer-pathfinder");
 
-var mineflayer_pathfinder_2 = require("mineflayer-pathfinder");
+var pathfinder = require("mineflayer-pathfinder").pathfinder;
+var Movements = require('mineflayer-pathfinder').Movements;
 
-var GoalFollow = mineflayer_pathfinder_2.goals.GoalFollow;
+var GoalFollow = require("mineflayer-pathfinder").goals.GoalFollow;
 
 var autoeat = require("mineflayer-auto-eat");
 
@@ -16,6 +16,7 @@ followUser = (playerToFollow,username)=>{
     this.bot.pathfinder.setGoal(new GoalFollow(playerToFollow, 2), true);
 }
 onHealthChange = ()=>{
+    let bot = this.bot;
         this.bot.on('health', function () {
             
             if (bot.food === 15) {
@@ -28,30 +29,41 @@ onHealthChange = ()=>{
 
 } 
 onWhisper = ()=>{
+    let bot = this.bot;
+    let owner = this.owner;
+    let logger = this.logger;
+    let followUser = this.followUser;
         this.bot.on('whisper', function (username, message) {
-            if (username === this.bot.username)
+            if (username === bot.username)
             return;
             try {
-                var playerToFollow = this.bot.players[username].entity;
-                if (username === this.owner) {
+                var playerToFollow = bot.players[username].entity;
+                if (username === owner) {
                     switch (message) {
                         case "follow me":
-                            followOwner(playerToFollow, username);
+                            followUser(playerToFollow, username);
                             break;
                             case "stop":
-                                this.bot.pathfinder.setGoal(null);
+                                bot.pathfinder.setGoal(null);
                                 break;
                             };
-                        } else if (username !== this.owner) {
+                        } else if (username !== owner) {
                             bot.whisper(username, 'Sorry, I am an AFK Bot');
                         };
                     } catch (err) {
-                        this.logger("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n            Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
+                        logger("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n         Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
                     };
                     //Error handling
                 });
 }
+onChat = (username,message)=>{
+    if (username){
+  this.logger(`Message from ${username}:  ${message}`)  
+    }
+}
 onDisconnect = ()=>{
+    let bot = this.bot;
+    let logger = this.logger;
                 this.bot.on('kicked', function (reason) {
                     //Parse response from server
                     let reasonKicked = JSON.parse(reason);
@@ -60,46 +72,52 @@ onDisconnect = ()=>{
                     return;
                     if (reasonKicked.extra[0].text.includes('banned')) {
                         //Check if bot was banned
-                        this.logger(' <STATUS> I got banned. Exiting in 5 seconds...');
+                        logger(' <STATUS> I got banned. Exiting in 5 seconds...');
                         //Exit process if banned 
                         
                     } else {
                         //If message does not include banned, then tell user and attempt to connect again set timeout
-                        this.logger(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
+                        logger(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
                         //Reset bot and retry joining
                         
                     };
                 });
 }
 onDeath = ()=>{
+    let logger = this.logger;
                 this.bot.on('death', function () {
-                    this.logger(" <STATUS> I died!");
+                    logger(" <STATUS> I died!");
                 });
 }
 onRespawn = ()=>{
+    let bot = this.bot;
+    let logger = this.logger;
                 this.bot.on('respawn', function () {
-                    this.logger(" <STATUS> Respawned at x: " + Math.round(bot.entity.position.x) + " y: " + Math.round(bot.entity.position.y) + " z: " + Math.round(bot.entity.position.z));
+                    logger(" <STATUS> Respawned at x: " + Math.round(bot.entity.position.x) + " y: " + Math.round(bot.entity.position.y) + " z: " + Math.round(bot.entity.position.z));
                 });
 }
 onAttacked = ()=>{
-                this.bot.on('onCorrelateAttack', function (attacker, victim, weapon) {
-                    if (this.bot.username === victim.username) {
+    let bot = this.bot;
+    let logger = this.logger;
+                bot.on('onCorrelateAttack', function (attacker, victim, weapon) {
+                    if (bot.username === victim.username) {
                         if (weapon) {
-                            this.logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
+                            logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
                         } else {
-                            this.logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username));
+                            logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username));
                         };
                     };
                 });
 }
 lookNearEntity = ()=>{
+    let bot = this.bot;
                 setInterval(function () {
-                    var entity = this.bot.nearestEntity();
+                    var entity = bot.nearestEntity();
                     if (entity !== null) {
                         if (entity.type === 'player') {
-                            this.bot.lookAt(entity.position.offset(0, 1.6, 0));
+                            bot.lookAt(entity.position.offset(0, 1.6, 0));
                         } else if (entity.type === 'mob') {
-                            this.bot.lookAt(entity.position);
+                            bot.lookAt(entity.position);
                         };
                     };
                 }, 100);
@@ -143,16 +161,19 @@ constructor(outputfunct,id,ip,port,username,password=null,owner){
         password: this.password,
         hideErrors: true
     });
-    this.bot.connect();
+    
     bloodhoundPlugin(this.bot);
-    this.bot.bloodhound.yaw_correlation_enabled = true
+
+    //this.bot.bloodhound.yaw_correlation_enabled = true
     
     this.bot.loadPlugin(pathfinder);
     
     this.bot.loadPlugin(autoeat);
-     
-    var mcData = require('minecraft-data')(bot.version);
-    var defaultMove = new mineflayer_pathfinder_1.Movements(bot, mcData);
+    
+    this.bot.once('spawn',()=>{
+
+    this.mcData = require('minecraft-data')(this.bot.version);
+    var defaultMove = new Movements(this.bot, this.mcData);
     defaultMove.allowFreeMotion = true;
     this.bot.pathfinder.setMovements(defaultMove);
 
@@ -162,7 +183,8 @@ constructor(outputfunct,id,ip,port,username,password=null,owner){
         bannedFood: [],
     };
     this.#intialize();
-
+    this.logger('started')
+    });
 }
 }
 

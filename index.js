@@ -54,6 +54,7 @@ DiscordBot.onMessage(async (msg)=>{
                         msg.channel.send('You need to run _join and _setup to use this command.');
                     } else{
                         new mclient(database.users[dbgetObjIndex({id:msg.author.id})]);
+                        console.log(database.users[dbgetObjIndex({id:msg.author.id})].options.bot.server.ip);
                     }
                     break;
                 case 'stop':
@@ -64,8 +65,7 @@ DiscordBot.onMessage(async (msg)=>{
         }
     }
 });
-
-
+toDiscord('799844408132108334','test');
 
 
 

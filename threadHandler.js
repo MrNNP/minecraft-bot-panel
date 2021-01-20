@@ -1,6 +1,6 @@
 const { Worker } = require('worker_threads');
 
-const maxPerThread = 16;
+const maxPerThread = 32;
 var startSuccess = false;
 
 class threadHandler{
@@ -26,8 +26,9 @@ class threadHandler{
                 intent:'check'
             });
             child.child.once('message',(msg) =>{
+                if(msg.intent == 'response'){
                 responses[index] = msg.data.response;
-            });
+            }});
 
         });
         setTimeout(() => {
@@ -54,6 +55,7 @@ class threadHandler{
        msg.channel = database.users[dbgetObjIndex({id:msg.id})].channel;
         toDiscord(msg.channel,msg.data.response);
         }catch(e){}
+        console.log(msg);
     }
     onError = (msg) =>{
      //   this.workerList.users.forEach(user => {
@@ -62,13 +64,14 @@ class threadHandler{
         console.log(msg);
     }
     stop = (userObj) =>{
-        this.workerList.users.splice(this.workerList.users.indexOf(userObj.id),1);
-        
-        this.workerList.forEach((child,index) =>{
-            child.postMessage({
-                intent:'stop',
-                data:userObj
-            });
+        this.workerList.forEach((child)=>{child.users.splice(child.users.indexOf(userObj.id),1)});
+        let resp = {
+            intent:'stop',
+            data:userObj
+        }
+        this.workerList.forEach((child) =>{
+            child.child.postMessage(resp);
+            console.log(resp);
         });
     }
 
