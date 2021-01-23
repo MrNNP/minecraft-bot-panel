@@ -48,22 +48,43 @@ onWhisper = ()=>{
                                 break;
                             };
                         } else if (username !== owner) {
-                            bot.whisper(username, 'Sorry, I am an AFK Bot');
+                            bot.whisper(username, 'Im AFK');
                         };
+                        logger({
+                            intent:'whisper',
+                            data:{
+                                username:username,
+                                content:message
+                            }
+                        });
                     } catch (err) {
                         logger("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n         Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
                     };
                     //Error handling
                 });
 }
-onChat = (username,message)=>{
-    if (username){
-  this.logger(`Message from ${username}:  ${message}`)  
-    }
+onChat = ()=>{
+    let bot = this.bot;
+    this.bot.on('chat',(username,message)=>{
+       
+        try {
+                logger({
+                        intent:'chat',
+                        data:{
+                            username:username?'server/admin':username,
+                            content:message
+                        }
+                    });
+                } catch (err) {
+                    
+                }
+});
 }
 onDisconnect = ()=>{
-    let bot = this.bot;
+    //let bot = this.bot;
     let logger = this.logger;
+    let quitSelf = this.quitSelf;
+    let id = this.id;
                 this.bot.on('kicked', function (reason) {
                     //Parse response from server
                     let reasonKicked = JSON.parse(reason);
@@ -72,35 +93,63 @@ onDisconnect = ()=>{
                     return;
                     if (reasonKicked.extra[0].text.includes('banned')) {
                         //Check if bot was banned
-                        logger(' <STATUS> I got banned. Exiting in 5 seconds...');
+                        logger({
+                            intent:'disconnect',
+                            data:{
+                                reason:reasonKicked.extra[0].text,
+                                ban:true
+                            }
+                        });
                         //Exit process if banned 
                         
                     } else {
                         //If message does not include banned, then tell user and attempt to connect again set timeout
-                        logger(" <STATUS> I got kicked. Reconnecting in 5 seconds. Reason: " + reasonKicked.extra[0].text);
+                        logger({
+                            intent:'disconnect',
+                            data:{
+                                reason:reasonKicked.extra[0].text,
+                                ban:false
+                            }
+                        });
                         //Reset bot and retry joining
                         
                     };
+                    quitSelf({data:{id:id}});
                 });
 }
 onDeath = ()=>{
     let logger = this.logger;
+    let lastAttack = this.lastAttacker;
                 this.bot.on('death', function () {
-                    logger(" <STATUS> I died!");
+                    logger({
+                        intent:'death',
+                        data:{
+                            killer:lastAttack
+                        }
+                    });
                 });
 }
 onRespawn = ()=>{
     let bot = this.bot;
     let logger = this.logger;
                 this.bot.on('respawn', function () {
-                    logger(" <STATUS> Respawned at x: " + Math.round(bot.entity.position.x) + " y: " + Math.round(bot.entity.position.y) + " z: " + Math.round(bot.entity.position.z));
-                });
+                    logger({
+                        intent:'respawn',
+                        data:{
+                            x:Math.round(bot.entity.position.x),
+                            y:Math.round(bot.entity.position.y),
+                            z:Math.round(bot.entity.position.z)
+                        }
+                    });
+                    });
 }
 onAttacked = ()=>{
     let bot = this.bot;
     let logger = this.logger;
+    let lastAttacker = this.lastAttacker;
                 bot.on('onCorrelateAttack', function (attacker, victim, weapon) {
-                    if (bot.username === victim.username) {
+                    if (bot.username ===  victim.username) {
+                     lastAttacker = attacker.displayName;           
                         if (weapon) {
                             logger(" <STATUS> Got hurt by " + (attacker.displayName || attacker.username) + " with a/an " + weapon.displayName);
                         } else {
@@ -108,6 +157,7 @@ onAttacked = ()=>{
                         };
                     };
                 });
+        
 }
 lookNearEntity = ()=>{
     let bot = this.bot;
@@ -129,6 +179,7 @@ lookNearEntity = ()=>{
     this.onDisconnect();
     this.onDeath();
     this.onRespawn();
+    this.onChat();
     this.onAttacked();
     this.lookNearEntity();
 }
@@ -146,14 +197,16 @@ logger = (data)=>{
 
 }
 
-constructor(outputfunct,id,ip,port,username,password=null,owner){
+constructor(functs,id,ip,port,username,password=null,owner){
     this.id = id;
-    this.output = outputfunct;
+    this.output = functs.output;
+    this.quitSelf= functs.quitSelf;
     this.owner = owner;
     this.ip = ip;
     this.port = port;
     this.username = username;
     this.password = password;
+    this.lastAttacker = undefined;
     this.bot = mineflayer.createBot({
 
         host: this.ip,
@@ -183,7 +236,16 @@ constructor(outputfunct,id,ip,port,username,password=null,owner){
         bannedFood: [],
     };
     this.#intialize();
-    this.logger('started')
+    let bot = this.bot;
+    this.logger({
+        intent:'spawn',
+        data:{
+            x:bot.entity.position.x,
+            y:bot.entity.position.y,
+            z:bot.entity.position.z,
+            dim:bot.entity.position.dim
+        }
+    });
     });
 }
 }

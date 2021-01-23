@@ -19,7 +19,7 @@ parentPort.on('message', (input)=>{
                 id:input.data.id, 
                 channel:input.data.channel,
                 client:new Client(
-                sendOut,
+                {output:sendOut,quitSelf:quitInstance},
                 input.data.id,
                 input.data.options.bot.server.ip,
                 null,
@@ -45,10 +45,7 @@ parentPort.on('message', (input)=>{
         process.exit(0);
         break;
         case 'stop':
-            
-                let child = checkID(input.data.id);
-                child.client.bot.quit();
-                chlid = undefined;
+        quitInstance(input);            
             
         }
 
@@ -59,11 +56,20 @@ function sendOut(data){
     
 }
 
-function checkID(id){
+function quitInstance(input){
+    let child = removegetInstance(input.data.id);
+                
+    child.client.bot.quit();
+
+    chlid = undefined;
+}
+
+function removegetInstance(id){
     let child;
-    mclientList.forEach((client)=>{
+    mclientList.forEach((client,index)=>{
         if(id==client.id){
             child = client;
+            mclientList.splice(index,1);
             return;
         }
     });

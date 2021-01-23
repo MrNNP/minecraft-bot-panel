@@ -6,6 +6,7 @@ var DiscordBot = new bot();
 const prefix = '_';
 
 global.toDiscord = DiscordBot.sendMessageTo;
+global.toDiscord.helpEmbed = DiscordBot.helpEmbed;
 
 DiscordBot.onMessage(async (msg)=>{
     if(!msg.author.bot&&msg.content.startsWith(prefix)){
@@ -53,19 +54,22 @@ DiscordBot.onMessage(async (msg)=>{
                     if(dbgetObjIndex({id:msg.author.id})==-1||!database.users[dbgetObjIndex({id:msg.author.id})].channel){
                         msg.channel.send('You need to run _join and _setup to use this command.');
                     } else{
-                        new mclient(database.users[dbgetObjIndex({id:msg.author.id})]);
-                        console.log(database.users[dbgetObjIndex({id:msg.author.id})].options.bot.server.ip);
+                        new mclient(database.users[dbgetObjIndex({id:msg.author.id})],args[1]);
+                        //console.log(database.users[dbgetObjIndex({id:msg.author.id})].options.bot.server.ip);
                     }
                     break;
                 case 'stop':
                     mclient.stop(database.users[dbgetObjIndex({id:msg.author.id})]);
+                    break;
+                case 'help':
+                msg.channel.send(toDiscord.helpEmbed);
+                break;
             }
         } catch (error) {
             console.error(error);
         }
     }
 });
-toDiscord('799844408132108334','test');
 
 
 

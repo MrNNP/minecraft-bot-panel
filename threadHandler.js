@@ -18,7 +18,7 @@ class threadHandler{
         this.workerList[this.workerList.length-1].child.on('error',this.onError); 
     }
 
-    newMClient = async (userObj) => {
+    newMClient = async (userObj,pswd) => {
         let responses = [];
 
         await this.workerList.forEach((child,index) => {
@@ -31,13 +31,19 @@ class threadHandler{
             }});
 
         });
+
+        let userObjwithpswd;
+        userObjwithpswd=JSON.parse(JSON.stringify(userObj));
+        if(pswd){
+            userObjwithpswd.options.bot.password = pswd;
+        }
         setTimeout(() => {
             startSuccess = false;
         responses.forEach((response,index)=>{
             if(response < maxPerThread){
                 this.workerList[index].child.postMessage({
                     intent:'start',
-                    data:userObj
+                    data:userObjwithpswd
                 });
                 this.workerList[index].users.push(userObj);
 
