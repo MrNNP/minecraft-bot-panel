@@ -1,5 +1,7 @@
+const port = process.env.PORT || 3000
+const express = require('express')
 const db = require('./database.js');
-
+const app = express();
 global.database = db.parsed;
 const { Discord, User, bot, mclient } = require('./prototypes.js');
 var DiscordBot = new bot();
@@ -71,6 +73,14 @@ DiscordBot.onMessage(async (msg)=>{
     }
 });
 
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
 
 
 setInterval(()=>{db.update(database)},10000);
