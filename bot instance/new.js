@@ -121,7 +121,7 @@ onDisconnect = ()=>{
                             intent:'disconnect',
                             data:{
                                 reason:!!reasonKicked.text?reasonKicked.text:'no reason\n provided',
-                                ban:!reasonKicked.text?'yes':'no'
+                                ban:!reasonKicked.text?'yes, but some other things could result in this response are: \n You logged in with a different bot/ from a different location \n The server closed':'no'
                             }
                         });
                     

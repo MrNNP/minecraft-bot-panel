@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:15-alpine
 WORKDIR /minecraft-bot-panel
 COPY . .
 RUN npm install --production
