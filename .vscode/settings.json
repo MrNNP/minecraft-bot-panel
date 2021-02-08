@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/99f51507-26dc-458e-9c40-75994a608800/resourceGroups/MC-AFK/providers/Microsoft.Web/sites/mcafk",
+    "appService.deploySubpath": "."
+}

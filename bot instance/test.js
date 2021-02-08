@@ -3,7 +3,9 @@ var bot = new Client({output:(loga)=>{
     console.log(loga)
 },quitSelf:(loga)=>{
     console.log(loga)
-}},48409238409238,'edisonmc.mcs.lol',25565,'MrNNP',undefined,'MrNNP');
+
+}},48409238409238,'localhost',25565,'imaBot',undefined,'MrNNP');
+
 
 bot.bot.on('spawn',()=>{
     console.log('spawned');
