@@ -1,3 +1,18 @@
+const port = process.env.PORT || 3000
+const express = require('express')
+const app = express();
+
+app.get('/', (req, res) => {
+    res.send('Hello World! 2.0')
+  })
+  
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+  })
+
+
+
+
 const db = require('./database.js');
 
 global.database = db.parsed;
