@@ -76,7 +76,7 @@ onChat = ()=>{
                         }
                     });
                 } catch (err) {
-                    
+                    console.log(err);
                 }
 });
 }

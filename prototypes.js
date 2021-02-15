@@ -3,11 +3,11 @@ const Discord = require('discord.js');
 const database = require('./database');
 const token = 'Nzk5ODQxMDU3NTQxODQ5MTcw.YAJcCA.p5IrMf3aOc8hjHFIx8b-jOx97fc';
 //const { fork } = require('child_process');
+const mcclient = require('./bot instance/new').Client;
+//const threadHandlerclass = require('./threadHandler.js');
+//var threadHandler = new threadHandlerclass;
 
-const threadHandlerclass = require('./threadHandler.js');
-var threadHandler = new threadHandlerclass;
-
-
+var clients = [];
 
 class bot {
     
@@ -156,10 +156,32 @@ class User{
 }
 class mclient{
 constructor(userObj,pswd){
-    threadHandler.newMClient(userObj,pswd);
+    this.user = userObj;
+    clients.push({
+        client:new mcclient(
+            {
+                output:(msg)=>{
+                    toDiscord(this.user.channel,msg)
+                },
+                quitSelf:(data)=>{
+                    let clientid = clients.findIndex((value =>{value.user.id == data.data.id}));
+                    clients[clientid].client.quit();         
+                    clients.splice(clientid,1);
+                }
+            },
+            userObj.id,userObj.options.bot.server.ip,25565, userObj.options.bot.username,
+            userObj.options.bot.password,userObj.options.bot.owner
+
+        ),
+        user:userObj
+
+    });
 }
 static stop = (userObj) => {
-    threadHandler.stop(userObj);
+    let clientid = clients.findIndex((value =>{value.user.id == userObj.id}));
+                    clients[clientid].client.quit();         
+                    clients.splice(clientid,1);
+    //threadHandler.stop(userObj);
     
 }
 
