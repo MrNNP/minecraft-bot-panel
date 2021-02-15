@@ -6,24 +6,14 @@ var bloodhoundPlugin = require("mineflayer-bloodhound");
 var pathfinder = require("mineflayer-pathfinder").pathfinder;
 var Movements = require('mineflayer-pathfinder').Movements;
 
-var Goals = require("mineflayer-pathfinder").goals;
+var GoalFollow = require("mineflayer-pathfinder").goals.GoalFollow;
 
 var autoeat = require("mineflayer-auto-eat");
 
 class client {
 followUser = (playerToFollow,username)=>{
     this.bot.whisper(username, 'On my way');
-    this.bot.pathfinder.setGoal(new Goals.GoalFollow(playerToFollow, 2), true);
-}
-goto = (location) =>{
-    let bot = this.bot;
-    if(location.y != undefined){
-        bot.pathfinder.setGoal(new Goals.GoalNear(location.x, location.y, location.z, 1));
-
-    } else {
-        bot.pathfinder.setGoal(new Goals.GoalXZ(location.x,location.z));
-    }
-
+    this.bot.pathfinder.setGoal(new GoalFollow(playerToFollow, 2), true);
 }
 onHealthChange = ()=>{
     let bot = this.bot;
@@ -43,25 +33,17 @@ onWhisper = ()=>{
     let owner = this.owner;
     let logger = this.logger;
     let followUser = this.followUser;
-    let goto = this.goto;
         this.bot.on('whisper', function (username, message) {
             if (username === bot.username)
             return;
             try {
+                var playerToFollow = bot.players[username].entity;
                 if (username === owner) {
-                    let args = message.split(" "); 
-                    switch (args[0]) {
-                        case "follow":
-                            let playerToFollow = bot.players[username].entity;
+                    switch (message) {
+                        case "follow me":
                             followUser(playerToFollow, username);
                             break;
-                            case 'goto':
-                                if(args[3]!=undefined){
-                                goto({x:args[1],z:args[3],y:args[2]});
-                                } else{
-                                    goto({x:args[1],z:args[2]});
-                                }
-                                case "stop":
+                            case "stop":
                                 bot.pathfinder.setGoal(null);
                                 break;
                             };
@@ -76,13 +58,7 @@ onWhisper = ()=>{
                             }
                         });
                     } catch (err) {
-                        logger({
-                            intent:'whisper',
-                            data:{
-                                username:username,
-                                content:'error'+err
-                            }
-                        });
+                        logger("An error occurred when attempting to pathfind:\n            Something to check:\n            Make sure you are close to the bot\n         Make sure the bot is not already pathfinding to something\n\n            The process was not terminated because the error is not critical, so you can attempt to resolve the error and \n            try again without restart\n\n            Heres the error:    \n            " + err);
                     };
                     //Error handling
                 });
@@ -113,21 +89,31 @@ onDisconnect = ()=>{
                     //Parse response from server
                     let reasonKicked = JSON.parse(reason);
                     //Return if response empty
-                 //   if (!reasonKicked.extra)
-                  //  return;
-                    
+                    if (!reasonKicked.extra)
+                    return;
+                    if (reasonKicked.extra[0].text.includes('banned')) {
                         //Check if bot was banned
                         logger({
                             intent:'disconnect',
                             data:{
-                                reason:!!reasonKicked.text?reasonKicked.text:'no reason\n provided',
-                                ban:!reasonKicked.text?'yes, but some other things could result in this response are: \n You logged in with a different bot/ from a different location \n The server closed':'no'
+                                reason:reasonKicked.extra[0].text,
+                                ban:true
                             }
                         });
-                    
+                        //Exit process if banned 
+                        
+                    } else {
+                        //If message does not include banned, then tell user and attempt to connect again set timeout
+                        logger({
+                            intent:'disconnect',
+                            data:{
+                                reason:reasonKicked.extra[0].text,
+                                ban:false
+                            }
+                        });
                         //Reset bot and retry joining
                         
-                    
+                    };
                     quitSelf({data:{id:id}});
                 });
 }
