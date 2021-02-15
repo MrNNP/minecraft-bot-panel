@@ -70,6 +70,7 @@ function removegetInstance(id){
         if(id==client.id){
             child = client;
             mclientList.splice(index,1);
+            console.info('got one child to stop')
         }
     });
     return child;
