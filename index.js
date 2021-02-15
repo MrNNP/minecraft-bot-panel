@@ -54,6 +54,7 @@ DiscordBot.onMessage(async (msg)=>{
                     if(dbgetObjIndex({id:msg.author.id})==-1||!database.users[dbgetObjIndex({id:msg.author.id})].channel){
                         msg.channel.send('You need to run _join and _setup to use this command.');
                     } else{
+                        msg.channel.send(`starting bot`);
                         new mclient(database.users[dbgetObjIndex({id:msg.author.id})],args[1]);
                         //console.log(database.users[dbgetObjIndex({id:msg.author.id})].options.bot.server.ip);
                     }
