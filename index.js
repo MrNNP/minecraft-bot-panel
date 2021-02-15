@@ -1,5 +1,17 @@
+const port = process.env.PORT || 3000
+const express = require('express')
 const db = require('./database.js');
+const app = express();
 
+app.get('/', (req, res) => {
+    res.send('Hello World! 2.0')
+  });
+   
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+  });
+  
+  
 global.database = db.parsed;
 const { Discord, User, bot, mclient } = require('./prototypes.js');
 var DiscordBot = new bot();

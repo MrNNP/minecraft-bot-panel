@@ -105,7 +105,7 @@ class bot {
                     { name:'Did I get banned?', value:content.data.ban,inline:true}
                 )
                 .setTimestamp()
-                .setFooter('Put a link here','location to put');
+                .setFooter('Put a link here','https://discord.com');
                   break;
              case 'whisper':
                     embed = new Discord.MessageEmbed()
@@ -118,7 +118,10 @@ class bot {
                     .setTimestamp()
                     .setFooter('Put a link here','https://discord.com');
                      break;
-             default:
+             case 'custom':
+                 
+             break;
+            default:
                 embed = new Discord.MessageEmbed()
                 .setTitle(content.data.content)
                 .setColor(randColor())
